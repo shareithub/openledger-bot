@@ -45,16 +45,37 @@ async def get_account_details(token, index, use_proxy, proxies, accountIDs):
         proxy_url = proxies[index] if use_proxy else None
         headers = {'Authorization': f'Bearer {token}'}
         
-        reward_realtime_response = requests.get('https://rewardstn.openledger.xyz/api/v1/reward_realtime', headers=headers, proxies={'https': proxy_url} if use_proxy else {})
-        reward_history_response = requests.get('https://rewardstn.openledger.xyz/api/v1/reward_history', headers=headers, proxies={'https': proxy_url} if use_proxy else {})
+        reward_realtime_response = requests.get(
+            'https://rewardstn.openledger.xyz/api/v1/reward_realtime',
+            headers=headers,
+            proxies={'https': proxy_url} if use_proxy else {}
+        )
+        reward_history_response = requests.get(
+            'https://rewardstn.openledger.xyz/api/v1/reward_history',
+            headers=headers,
+            proxies={'https': proxy_url} if use_proxy else {}
+        )
         
-        total_heartbeats = int(reward_realtime_response.json()['data'][0]['total_heartbeats'])
-        total_points = int(reward_history_response.json()['data'][0]['total_points'])
+        # Log the responses for debugging
+        print(f'[DEBUG] Reward Real-time Response: {reward_realtime_response.json()}')
+        print(f'[DEBUG] Reward History Response: {reward_history_response.json()}')
+
+        # Check if the 'data' key exists and is not empty
+        if 'data' in reward_realtime_response.json() and reward_realtime_response.json()['data']:
+            total_heartbeats = int(reward_realtime_response.json()['data'][0]['total_heartbeats'])
+        else:
+            total_heartbeats = 0  # Default or error value
+
+        if 'data' in reward_history_response.json() and reward_history_response.json()['data']:
+            total_points = int(reward_history_response.json()['data'][0]['total_points'])
+        else:
+            total_points = 0  # Default or error value
+
         total = total_heartbeats + total_points
-        
         print(f'[INFO] Account {index + 1}: Total Heartbeat {total_heartbeats}, Total Points {total}, Proxy: {proxy_url or "None"}')
     except requests.exceptions.RequestException as error:
         print(f'[ERROR] Error getting account details for token index {index}: {error}')
+
 
 async def process_requests(use_proxy, tokens, proxies):
     accountIDs = {}
