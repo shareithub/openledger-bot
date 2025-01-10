@@ -1,0 +1,9 @@
+token=
+workerID=
+id=
+OwnerAddress=
+
+token=
+workerID=
+id=
+OwnerAddress=
