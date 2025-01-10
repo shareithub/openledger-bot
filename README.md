@@ -60,9 +60,13 @@ python3  openledger.py
 
 Example :
 token=123sbocahpeler
+
 workerID=123123
+
 id=123123
+
 OwnerAddress=0xakwokawok
+
 
 In file accounts.txt
 
