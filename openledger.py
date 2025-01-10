@@ -154,7 +154,7 @@ async def connect_websocket(token, workerID, id, ownerAddress, index, use_proxy,
                     }
                     print(f'[INFO] Sending heartbeat for WorkerID {workerID}')
                     await ws.send(json.dumps(heartbeat_message))
-                    await asyncio.sleep(0.1)
+                    await asyncio.sleep(10)
 
                     total_heartbeats = random.randint(50, 100)
                     total_points = random.randint(100, 200)
