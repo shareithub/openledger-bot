@@ -16,7 +16,7 @@
 
 1. Create screen :
 ```
-screen -S botopenledger
+screen -S openledger
 ```
 
 2. Update & Upgrade your device :
