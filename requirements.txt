@@ -1,0 +1,3 @@
+shareithub
+requests
+websockets
