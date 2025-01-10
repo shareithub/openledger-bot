@@ -52,7 +52,7 @@ python3  openledger.py
 ```
 
 
-# PASTE YOUR :
+# PASTE YOUR *In file accounts.txt* ( Support multi account ):
 - token
 - workerID
 - id
@@ -69,11 +69,9 @@ OwnerAddress=0xakwokawok
 
 
 
-# *In file accounts.txt*
-
 # Support use Proxy or No
 
 Use proxy ? u can paste in file proxy.txt
 
 
-# SUPPORT MULTI ACCOUNT
+
