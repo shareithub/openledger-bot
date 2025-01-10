@@ -58,6 +58,12 @@ python3  openledger.py
 - id
 - OwnerAddress
 
+Example :
+token=123sbocahpeler
+workerID=123123
+id=123123
+OwnerAddress=0xakwokawok
+
 In file accounts.txt
 
 # Support use Proxy or No
