@@ -156,7 +156,7 @@ async def main():
         return
 
     proxies = load_proxies()
-
+    gpu_list = load_gpu_list()
     data_assignments = load_data_assignments()
 
     if not use_proxy:
