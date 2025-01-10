@@ -101,6 +101,8 @@ async def process_requests(use_proxy, tokens, proxies):
         id = token_info['id']
         ownerAddress = token_info['ownerAddress']
 
+        proxy_index = index % len(proxies) if use_proxy and proxies else None
+
         tasks.append(asyncio.create_task(get_account_id(token, index, use_proxy, proxies, accountIDs)))
         tasks.append(asyncio.create_task(get_account_details(token, index, use_proxy, proxies, accountIDs)))
 
