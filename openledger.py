@@ -45,63 +45,32 @@ async def get_account_details(token, index, use_proxy, proxies, accountIDs):
         proxy_url = proxies[index] if use_proxy else None
         headers = {'Authorization': f'Bearer {token}'}
         
-        # Fetch data from API
-        reward_realtime_response = requests.get(
-            'https://rewardstn.openledger.xyz/api/v1/reward_realtime',
-            headers=headers,
-            proxies={'https': proxy_url} if use_proxy else {}
-        )
-        reward_history_response = requests.get(
-            'https://rewardstn.openledger.xyz/api/v1/reward_history',
-            headers=headers,
-            proxies={'https': proxy_url} if use_proxy else {}
-        )
-
-        # Log responses
-        print(f'[DEBUG] Reward Real-time Response: {reward_realtime_response.json()}')
-        print(f'[DEBUG] Reward History Response: {reward_history_response.json()}')
-
-        # Parse JSON responses
-        reward_realtime_json = reward_realtime_response.json()
-        reward_history_json = reward_history_response.json()
-
-        # Access and validate 'data' key
-        realtime_data = reward_realtime_json.get('data', [])
-        history_data = reward_history_json.get('data', [])
-
-        if isinstance(realtime_data, list) and len(realtime_data) > 0:
-            total_heartbeats = int(realtime_data[0].get('total_heartbeats', 0))
-        else:
-            total_heartbeats = 0  # Default value
-
-        if isinstance(history_data, list) and len(history_data) > 0:
-            total_points = int(history_data[0].get('total_points', 0))
-        else:
-            total_points = 0  # Default value
-
+        reward_realtime_response = requests.get('https://rewardstn.openledger.xyz/api/v1/reward_realtime', headers=headers, proxies={'https': proxy_url} if use_proxy else {})
+        reward_history_response = requests.get('https://rewardstn.openledger.xyz/api/v1/reward_history', headers=headers, proxies={'https': proxy_url} if use_proxy else {})
+        
+        total_heartbeats = int(reward_realtime_response.json()['data'][0]['total_heartbeats'])
+        total_points = int(reward_history_response.json()['data'][0]['total_points'])
         total = total_heartbeats + total_points
+        
         print(f'[INFO] Account {index + 1}: Total Heartbeat {total_heartbeats}, Total Points {total}, Proxy: {proxy_url or "None"}')
-
     except requests.exceptions.RequestException as error:
         print(f'[ERROR] Error getting account details for token index {index}: {error}')
-    except KeyError as error:
-        print(f'[ERROR] KeyError for token index {index}: {error}')
-    except Exception as error:
-        print(f'[ERROR] Unexpected error for token index {index}: {error}')
 
-async def process_requests(use_proxy, tokens, proxies):
+async def process_requests(use_proxy, accounts, proxies):
     accountIDs = {}
     gpu_list = load_gpu_list()
     data_assignments = load_data_assignments()
 
     tasks = []
-    for index, token_info in enumerate(tokens):
-        token = token_info['token']
-        workerID = token_info['workerID']
-        id = token_info['id']
-        ownerAddress = token_info['ownerAddress']
+    for index, account in enumerate(accounts):
+        token = account['token']
+        workerID = account['workerID']
+        id = account['id']
+        ownerAddress = account['ownerAddress']
 
-        proxy_index = index % len(proxies) if use_proxy and proxies else None
+        proxy_url = None
+        if use_proxy and proxies:
+            proxy_url = random.choice(proxies)
 
         tasks.append(asyncio.create_task(get_account_id(token, index, use_proxy, proxies, accountIDs)))
         tasks.append(asyncio.create_task(get_account_details(token, index, use_proxy, proxies, accountIDs)))
@@ -111,8 +80,13 @@ async def process_requests(use_proxy, tokens, proxies):
 async def connect_websocket(token, workerID, id, ownerAddress, index, use_proxy, proxies, gpu_list, data_assignments):
     ws_url = f"wss://apitn.openledger.xyz/ws/v1/orch?authToken={token}"
     
-    while True:
+    while True: 
         try:
+
+            proxy_url = None
+            if use_proxy and proxies:
+                proxy_url = random.choice(proxies) 
+
             async with websockets.connect(ws_url) as ws:
                 print(f'\n[INFO] WebSocket Connected: WorkerID {workerID}, AccountID {token}')
 
@@ -158,44 +132,44 @@ async def connect_websocket(token, workerID, id, ownerAddress, index, use_proxy,
                     await ws.send(json.dumps(heartbeat_message))
                     await asyncio.sleep(10)
 
-                    total_heartbeats = random.randint(50, 100)
+                    total_heartbeats = random.randint(50, 100) 
                     total_points = random.randint(100, 200)
                     total = total_heartbeats + total_points
-                    print(f'[INFO] Account {index + 1}: Total Heartbeat {total_heartbeats}, Total Points {total}, Proxy: {proxies[index] if use_proxy else "None"}')
+                    print(f'[INFO] Account {index + 1}: Total Heartbeat {total_heartbeats}, Total Points {total}, Proxy: {proxy_url or "None"}')
 
         except (websockets.exceptions.ConnectionClosedError, asyncio.TimeoutError) as e:
             print(f'[ERROR] WebSocket error for WorkerID {workerID}: {str(e)}. Retrying...')
-            await asyncio.sleep(5)
-            continue 
+            await asyncio.sleep(5) 
+            continue  
         except Exception as e:
             print(f'[ERROR] Unexpected error for WorkerID {workerID}: {str(e)}. Retrying...')
             await asyncio.sleep(5) 
-            continue  
+            continue
 
 async def main():
-    tokens = load_accounts()
-    proxies = load_proxies()
-
-    gpu_list = load_gpu_list()
-    data_assignments = load_data_assignments()
-
-    if len(proxies) < len(tokens):
-        print('[ERROR] Not enough proxies for the number of accounts. Please provide enough proxies.')
-        return
 
     use_proxy = ask_use_proxy() 
 
-    if not use_proxy:
-        print("[INFO] Proceeding without using proxy.")
+    accounts = load_accounts()
+    if not accounts:
+        print("[ERROR] Tidak ada akun ditemukan. Pastikan file 'account.txt' berisi akun.")
+        return
 
-    await process_requests(use_proxy, tokens, proxies)
+    proxies = load_proxies()
+
+    data_assignments = load_data_assignments()
+
+    if not use_proxy:
+        print("[INFO] Melanjutkan tanpa menggunakan proxy.")
+
+    await process_requests(use_proxy, accounts, proxies)
 
     tasks = []
-    for index, token_info in enumerate(tokens):
-        token = token_info['token']
-        workerID = token_info['workerID']
-        id = token_info['id']
-        ownerAddress = token_info['ownerAddress']
+    for index, account in enumerate(accounts):
+        token = account['token']
+        workerID = account['workerID']
+        id = account['id']
+        ownerAddress = account['ownerAddress']
 
         tasks.append(asyncio.create_task(connect_websocket(token, workerID, id, ownerAddress, index, use_proxy, proxies, gpu_list, data_assignments)))
     
