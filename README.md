@@ -37,6 +37,9 @@ sudo apt install python3-pip
 git clone https://github.com/shareithub/openledger-bot.git
 ```
 ```
+cd openledger-bot
+```
+```
 python3 -m venv openledger
 ```
 ```
