@@ -1,5 +1,8 @@
 # BOT OPEN LEDGER WITH EXTENSION
 
+# Join Openledger Extension :
+* [https://testnet.openledger.xyz](https://testnet.openledger.xyz/?referral_code=72pkbrny4m)
+
 #JOIN OFFICIAL CHANNEL :
 
 * [TELEGRAM CHANNEL](https://t.me/SHAREITHUB_COM)
