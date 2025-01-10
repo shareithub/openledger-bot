@@ -68,7 +68,8 @@ id=123123
 OwnerAddress=0xakwokawok
 
 
-In file accounts.txt
+
+*In file accounts.txt*
 
 # Support use Proxy or No
 
