@@ -6,4 +6,4 @@ OwnerAddress=
 token=
 workerID=
 id=
-OwnerAddress=
+ownerAddress=
