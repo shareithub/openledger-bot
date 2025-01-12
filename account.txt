@@ -1,7 +1,7 @@
 token=
 workerID=
 id=
-OwnerAddress=
+ownerAddress=
 
 token=
 workerID=
