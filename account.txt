@@ -1,7 +1,7 @@
-token=
-workerID=
-id=
-ownerAddress=
+token=123sbocahpeler
+workerID=123123
+id=123123
+ownerAddress=0xd1bA424f335A0c5EB32c7BC3b56fEe4ebcb5b155
 
 token=
 workerID=
